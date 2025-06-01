@@ -13,6 +13,11 @@ class magic_circle {
         if (this.#visible == 0){
             return(0);
         }
+        if (settings.debug == 1) {
+            context.fillStyle = 'red';
+            context.fillRect(this.x - 5, this.y - 5,10,10);
+        }
+        this.offset = {x:0,y:0};
         for (var i = 0; i < this.children.length; i++){
             this.children[i].draw();
         }
@@ -64,12 +69,16 @@ class shape {
     draw() {
         DrawSetup(this);
         let a = 360 / this.sides;
+        if (settings.debug == 1) {
+            context.fillStyle = 'cyan';
+            context.fillRect(this.x + this.parent.x - 5, this.y + this.parent.y - 5,10,10);
+        }
         context.beginPath();
         for (var i = 0; i < this.sides; i++) {
             let fx = (this.#offset + angle * -this.incAngle - this.offAngle + a * i) * PI;
             context.lineTo(
-                this.parent.x + this.x + this.radius * -Math.sin(fx) * this.scale
-                ,this.parent.y + this.y + this.radius * -Math.cos(fx) * this.scale
+                this.parent.offset.x + this.parent.x + this.x + this.radius * -Math.sin(fx) * this.scale
+                ,this.parent.offset.y + this.parent.y + this.y + this.radius * -Math.cos(fx) * this.scale
             );
         }
         context.closePath();
@@ -124,14 +133,19 @@ class arc {
         obj.last.add = this;
         this.parent = obj.last;
         this.parent.last = this;
+        // angles
         this.angle1 = angle1 || 0;
         this.angle2 = angle2 || 2
         this.#incAngle = incAngle || 0;
     }
     draw(){
+        if (settings.debug == 1) {
+            context.fillStyle = 'black';
+            context.fillRect(this.x + this.parent.x - 5, this.y + this.parent.y - 5,10,10);
+        }
         DrawSetup(this);
         context.beginPath();
-        context.arc(this.x + this.parent.x,this.y + this.parent.y, this.radius * this.scale,
+        context.arc(this.x + this.parent.x + this.parent.offset.x,this.y + this.parent.y + this.parent.offset.y, this.radius * this.scale,
             (this.angle2 + this.#offset + angle * this.incAngle) * PI,
             (this.angle1 + this.#offset + angle * this.incAngle) * PI);
         context.stroke();
@@ -173,6 +187,39 @@ class arc {
             throw TypeError('ScaleStyle must be "inherit" or "overRide"');
         }
         this.#scaleStyle = val;
+    }
+}
+
+class offset {
+    #incAngle;
+    #offset = 0;
+    constructor(radius,angle,incAngle) {
+        let parent = Object.fromEntries( Object.entries(obj.last).filter(e => Object.keys(drawSettings).includes(e[0])) );
+        Object.assign(this,{radius,angle,...parent});
+        // Record parent child relationship
+        obj.last.add = this;
+        this.parent = obj.last;
+        this.parent.last = this;
+        this.#incAngle = incAngle || 0;
+    }
+    draw() {
+        let fx = -(this.angle + this.#offset - angle * this.incAngle) * PI
+        this.parent.offset.x += this.radius * -Math.sin(fx);
+        this.parent.offset.y += this.radius * -Math.cos(fx);
+        if (settings.debug == 1) {
+            context.fillStyle = 'lime';
+            context.fillRect(this.parent.offset.x + this.parent.x - 5, this.parent.offset.y + this.parent.y - 5,10,10);
+        }
+    }
+
+    // increment angle
+    get incAngle() { return(this.#incAngle); }
+
+    set incAngle(val) {
+        if (typeof val !== 'number')
+            throw TypeError('Angle increment must be a number');
+        this.#offset += angle * (val - this.#incAngle)
+        this.#incAngle = val;
     }
 }
 

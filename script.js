@@ -8,6 +8,10 @@ workspace = {
     y:0,
     scale:1
 },
+settings = {
+    scrollSens:10,
+    debug:1,
+},
 drawSettings = {
     color:'purple',
     lineWidth:3,
@@ -32,7 +36,14 @@ new shape(0,0,3,120,60,-5);
 new shape(0,0,3,50,0,5);
 new shape(0,0,3,50,60,5);
 const b = new arc(0,0,55,0,180,5);
-// obj.last.last.scale = 2;
+const c = new offset(100,90,4);
+// new offset(100,90,8);
+new shape(0,0,5,20,60,-5);
+// new arc(0,0,100);
+
+
+new magic_circle(100,1000);
+new shape(0,0,3,100,0,5);
 
 
 //# draw
@@ -90,7 +101,7 @@ canvas.addEventListener('wheel', e => {
      const dir = -e.deltaY / Math.abs(e.deltaY) || 0
     // old/new scales
     const old = workspace.scale; 
-    workspace.scale += dir * workspace.scale / 10;
+    workspace.scale += dir * workspace.scale / (100 / settings.scrollSens);
     // Bind scale
     workspace.scale > 20 && (workspace.scale = 20);
     workspace.scale < 1/10 && (workspace.scale = 1/10);
