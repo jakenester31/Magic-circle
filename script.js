@@ -10,7 +10,7 @@ workspace = {
 },
 settings = {
     scrollSens:10,
-    debug:1,
+    debug:0,
 },
 drawSettings = {
     color:'purple',
@@ -31,19 +31,21 @@ new ResizeObserver(function(){
 
 // Objects (testing)
 const t = new magic_circle(100,100,1);
+// outer
 const a = new shape(0,0,3,120,0,-5);
 new shape(0,0,3,120,60,-5);
+// inner
 new shape(0,0,3,50,0,5);
 new shape(0,0,3,50,60,5);
-const b = new arc(0,0,55,0,180,5);
+
+const b = new arc(0,0,55,0,140,5);
+
 const c = new offset(100,90,4);
-// new offset(100,90,8);
 new shape(0,0,5,20,60,-5);
-// new arc(0,0,100);
 
-
-new magic_circle(100,1000);
+new magic_circle(100,400);
 new shape(0,0,3,100,0,5);
+
 
 
 //# draw
